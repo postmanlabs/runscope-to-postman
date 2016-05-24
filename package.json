@@ -1,0 +1,24 @@
+{
+    "name": "runscope-postman2-converter",
+    "version": "0.0.1",
+    "description": "Convert Runscope Radar Tests to Postman Collection v2",
+    "main": "index.js",
+    "scripts": {
+        "test": "node tests/test.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/postmanlabs/runscope-postman2-converter.git"
+    },
+    "keywords": [
+        "runscope",
+        "postman"
+    ],
+    "dependencies": {
+        "lodash": "4.13.1",
+        "node-uuid": "1.4.1",
+        "postman-collection": "0.1.0"
+    },
+    "author": "Postman Labs",
+    "license": "MIT"
+}

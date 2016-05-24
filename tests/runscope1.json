@@ -1,0 +1,168 @@
+{
+  "trigger_url": "https://api.runscope.com/radar/a9b309bf-e614-484c-a1ca-a720c90ac331/trigger", 
+  "name": "MY TEST NAME", 
+  "version": "1.0", 
+  "exported_at": 1464048914, 
+  "steps": [
+    {
+      "headers": {
+        "hk2": [
+          "hv2"
+        ], 
+        "hk1": [
+          "hv1"
+        ]
+      }, 
+      "url": "http://httpbin.org/get?uk1=uk2", 
+      "variables": [], 
+      "args": {}, 
+      "step_type": "request", 
+      "auth": {
+        "username": "BASIC_USERNAME", 
+        "auth_type": "basic", 
+        "password": "BASIC_PASSWORD"
+      }, 
+      "note": "", 
+      "fragment": "", 
+      "assertions": [
+        {
+          "comparison": "equal_number", 
+          "value": 200, 
+          "source": "response_status"
+        }, 
+        {
+          "comparison": "equal", 
+          "property": "args.u1", 
+          "value": "k1", 
+          "source": "response_json"
+        }
+      ], 
+      "scripts": [], 
+      "before_scripts": [], 
+      "data": "", 
+      "method": "GET"
+    }, 
+    {
+      "body": "RAW BODY", 
+      "form": {}, 
+      "url": "http://httpbin.org/post?uk1=uk2", 
+      "variables": [], 
+      "step_type": "request", 
+      "auth": {
+        "username": "", 
+        "auth_type": "basic", 
+        "password": "BASIC_PASSWORD"
+      }, 
+      "fragment": "", 
+      "note": "", 
+      "headers": {
+        "hk2": [
+          "hv2"
+        ], 
+        "hk1": [
+          "hv1"
+        ]
+      }, 
+      "assertions": [
+        {
+          "comparison": "equal_number", 
+          "value": 200, 
+          "source": "response_status"
+        }, 
+        {
+          "comparison": "equal", 
+          "property": "args.u1", 
+          "value": "k1", 
+          "source": "response_json"
+        }
+      ], 
+      "scripts": [], 
+      "before_scripts": [], 
+      "method": "POST"
+    }, 
+    {
+      "body": "", 
+      "form": {
+        "fk1": [
+          "fv1"
+        ]
+      }, 
+      "url": "http://httpbin.org/post?uk1=uk2", 
+      "variables": [], 
+      "step_type": "request", 
+      "auth": {
+        "username": "", 
+        "auth_type": "basic", 
+        "password": "BASIC_PASSWORD"
+      }, 
+      "fragment": "", 
+      "note": "", 
+      "headers": {
+        "hk2": [
+          "hv2"
+        ], 
+        "hk1": [
+          "hv1"
+        ]
+      }, 
+      "assertions": [
+        {
+          "comparison": "equal_number", 
+          "value": 200, 
+          "source": "response_status"
+        }, 
+        {
+          "comparison": "equal", 
+          "property": "args.u1", 
+          "value": "k1", 
+          "source": "response_json"
+        }
+      ], 
+      "scripts": [], 
+      "before_scripts": [], 
+      "method": "POST"
+    }, 
+    {
+      "body": "{\r\n \"JSON BODY\": true\r\n}", 
+      "form": {}, 
+      "url": "http://httpbin.org/post?uk1=uk2", 
+      "variables": [], 
+      "step_type": "request", 
+      "auth": {
+        "username": "", 
+        "auth_type": "basic", 
+        "password": "BASIC_PASSWORD"
+      }, 
+      "fragment": "", 
+      "note": "", 
+      "headers": {
+        "hk2": [
+          "hv2"
+        ], 
+        "hk1": [
+          "hv1"
+        ], 
+        "Content-Type": [
+          "application/json"
+        ]
+      }, 
+      "assertions": [
+        {
+          "comparison": "equal_number", 
+          "value": 200, 
+          "source": "response_status"
+        }, 
+        {
+          "comparison": "equal", 
+          "property": "args.u1", 
+          "value": "k1", 
+          "source": "response_json"
+        }
+      ], 
+      "scripts": [], 
+      "before_scripts": [], 
+      "method": "POST"
+    }
+  ], 
+  "description": "MY TEST DESC"
+}
