@@ -121,8 +121,10 @@ var runscopeConverterV1 = {
 
 	handleAuth: function(request, step) {
 		if(step.auth.auth_type === "basic") {
-			request.currentHelper = "basic";
+			request.currentHelper = "basicAuth";
 			request.helperAttributes = {
+				id: "basic",
+				saveToRequest: true,
 				username: step.auth.username,
 				password: step.auth.password,
 			};
