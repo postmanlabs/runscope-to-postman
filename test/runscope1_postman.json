@@ -1,0 +1,102 @@
+{
+    "id": "a9b5466f-61f5-497c-a3ef-95e047720cba",
+    "name": "MY TEST NAME",
+    "description": "MY TEST DESC",
+    "order": [
+        "d3cc5099-9ea3-421a-9b03-f55ebd2d8dd3",
+        "03d8f53b-7ff7-408e-afd9-5658a56fe4ab",
+        "a991ec5a-ffb2-41a0-97cf-f26112aae79d",
+        "20fc1473-123a-4a42-8334-4eaec51c773c"
+    ],
+    "folders": [],
+    "requests": [
+        {
+            "id": "d3cc5099-9ea3-421a-9b03-f55ebd2d8dd3",
+            "url": "http://httpbin.org/get?uk1=uk2",
+            "headers": "hk2:hv2\nhk1:hv1\n",
+            "pathVariables": {},
+            "method": "GET",
+            "name": "http://httpbin.org/get?uk1=uk2",
+            "description": "",
+            "tests": "// You will need to convert this to a Postman-compliant script\nTEST SCRIPT 1;\nTEST SCRIPT 2;",
+            "currentHelper": "basicAuth",
+            "helperAttributes": {
+                "id": "basic",
+                "saveToRequest": true,
+                "username": "BASIC_USERNAME",
+                "password": "BASIC_PASSWORD"
+            },
+            "preRequestScript": "// You will need to convert this to a Postman-compliant script\nPRESCRIPT 1\nPRE SCRIPT 2",
+            "collectionId": "a9b5466f-61f5-497c-a3ef-95e047720cba"
+        },
+        {
+            "id": "03d8f53b-7ff7-408e-afd9-5658a56fe4ab",
+            "url": "http://httpbin.org/post?uk1=uk2",
+            "headers": "hk2:hv2\nhk1:hv1\n",
+            "pathVariables": {},
+            "method": "POST",
+            "name": "http://httpbin.org/post?uk1=uk2",
+            "description": "",
+            "tests": "// You will need to convert this to a Postman-compliant script\n",
+            "dataMode": "raw",
+            "data": "RAW BODY",
+            "currentHelper": "basicAuth",
+            "helperAttributes": {
+                "id": "basic",
+                "saveToRequest": true,
+                "username": "",
+                "password": "BASIC_PASSWORD"
+            },
+            "preRequestScript": "// You will need to convert this to a Postman-compliant script\n",
+            "collectionId": "a9b5466f-61f5-497c-a3ef-95e047720cba"
+        },
+        {
+            "id": "a991ec5a-ffb2-41a0-97cf-f26112aae79d",
+            "url": "http://httpbin.org/post?uk1=uk2",
+            "headers": "hk2:hv2\nhk1:hv1\n",
+            "pathVariables": {},
+            "method": "POST",
+            "name": "http://httpbin.org/post?uk1=uk2",
+            "description": "",
+            "tests": "// You will need to convert this to a Postman-compliant script\n",
+            "dataMode": "urlencoded",
+            "data": [
+                {
+                    "key": "fk1",
+                    "value": "fv1"
+                }
+            ],
+            "currentHelper": "basicAuth",
+            "helperAttributes": {
+                "id": "basic",
+                "saveToRequest": true,
+                "username": "",
+                "password": "BASIC_PASSWORD"
+            },
+            "preRequestScript": "// You will need to convert this to a Postman-compliant script\n",
+            "collectionId": "a9b5466f-61f5-497c-a3ef-95e047720cba"
+        },
+        {
+            "id": "20fc1473-123a-4a42-8334-4eaec51c773c",
+            "url": "http://httpbin.org/post?uk1=uk2",
+            "headers": "hk2:hv2\nhk1:hv1\nContent-Type:application/json\n",
+            "pathVariables": {},
+            "method": "POST",
+            "name": "http://httpbin.org/post?uk1=uk2",
+            "description": "",
+            "tests": "// You will need to convert this to a Postman-compliant script\n",
+            "dataMode": "raw",
+            "data": "{\r\n \"JSON BODY\": true\r\n}",
+            "currentHelper": "basicAuth",
+            "helperAttributes": {
+                "id": "basic",
+                "saveToRequest": true,
+                "username": "",
+                "password": "BASIC_PASSWORD"
+            },
+            "preRequestScript": "// You will need to convert this to a Postman-compliant script\n",
+            "collectionId": "a9b5466f-61f5-497c-a3ef-95e047720cba"
+        }
+    ],
+    "timestamp": 1464167393703
+}
