@@ -188,7 +188,7 @@ var runscopeConverterV1 = {
 			pathVariables: {},
 			method: step.method,
 			name: step.url,
-			description: '',
+			description: step.note,
 			tests: ''
 		};
 
