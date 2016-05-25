@@ -154,12 +154,29 @@ var runscopeConverterV1 = {
 		}
 	},
 
-	handleTests: function(request, step) {
+	handleAssertions: function(request, step) {
 		var tests = "";
 		_.each(step.assertions, function(ass) {
 			//LADER DUDES
 		});
 		return tests;
+	},
+
+	handleScripts: function(request, step) {
+		if(!step.before_scripts) {
+			step.before_scripts = [];
+		}
+		request.preRequestScript = "// You will need to convert this to a " + 
+			"Postman-compliant script\n" + 
+			step.before_scripts.join("\n");
+
+
+		if(!step.scripts) {
+			step.scripts = [];
+		}
+		request.tests = "// You will need to convert this to a " + 
+			"Postman-compliant script\n" + 
+			step.scripts.join("\n");
 	},
 
 	getRequestFromStep: function(step) {
@@ -180,7 +197,9 @@ var runscopeConverterV1 = {
 
 		oldThis.handleAuth(request, step);
 
-		oldThis.handleTests(request, step);
+		oldThis.handleScripts(request, step);
+
+		oldThis.handleAssertions(request, step);
 
 		return request;
 	},

@@ -2,17 +2,9 @@
   "trigger_url": "https://api.runscope.com/radar/a9b309bf-e614-484c-a1ca-a720c90ac331/trigger", 
   "name": "MY TEST NAME", 
   "version": "1.0", 
-  "exported_at": 1464048914, 
+  "exported_at": 1464167006, 
   "steps": [
     {
-      "headers": {
-        "hk2": [
-          "hv2"
-        ], 
-        "hk1": [
-          "hv1"
-        ]
-      }, 
       "url": "http://httpbin.org/get?uk1=uk2", 
       "variables": [], 
       "args": {}, 
@@ -22,8 +14,16 @@
         "auth_type": "basic", 
         "password": "BASIC_PASSWORD"
       }, 
-      "note": "", 
       "fragment": "", 
+      "note": "", 
+      "headers": {
+        "hk2": [
+          "hv2"
+        ], 
+        "hk1": [
+          "hv1"
+        ]
+      }, 
       "assertions": [
         {
           "comparison": "equal_number", 
@@ -37,8 +37,14 @@
           "source": "response_json"
         }
       ], 
-      "scripts": [], 
-      "before_scripts": [], 
+      "scripts": [
+        "TEST SCRIPT 1;", 
+        "TEST SCRIPT 2;"
+      ], 
+      "before_scripts": [
+        "PRESCRIPT 1", 
+        "PRE SCRIPT 2"
+      ], 
       "data": "", 
       "method": "GET"
     }, 
