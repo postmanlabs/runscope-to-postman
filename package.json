@@ -1,14 +1,17 @@
 {
-    "name": "runscope-postman2-converter",
+    "name": "@postmanlabs/runscope-to-postman",
     "version": "0.0.1",
     "description": "Convert Runscope Radar Tests to Postman Collection v2",
     "main": "index.js",
+    "publishConfig":{
+        "registry":"https://npm.postmanlabs.com"
+    },
     "scripts": {
         "test": "scripts/test.sh"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/postmanlabs/runscope-postman2-converter.git"
+        "url": "git+https://github.com/postmanlabs/runscope-to-postman.git"
     },
     "keywords": [
         "runscope",
