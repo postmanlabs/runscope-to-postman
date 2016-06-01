@@ -178,6 +178,95 @@ var runscopeConverterV1 = {
 			step.scripts.join('\n');
 	},
 
+	getRHSFromComparisonAndOperands: function(comparison, oper1, oper2) {
+		switch(comparison) {
+			case 'equal_number':
+			case 'equal':
+				return oper1 + ' == ' + oper2;
+			case 'not_equal':
+				return oper1 + '!=' + oper2;
+			case 'empty':
+				return '_.isEmpty(' + oper1 + ')';
+			case 'not_empty':
+				return '!_.isEmpty(' + oper1 + ')';
+			case 'contains':
+				return '_.contains(' + oper1 + ')';
+			case 'does_not_contain':
+				return '!_.contains(' + oper1 + ')';
+			case 'is_a_number':
+				return '!isNaN('+oper1+')';
+			case 'is_less_than':
+				return oper1 + ' < ' + oper2;
+			case 'is_less_than_or_equal':
+				return oper1 + ' <= ' + oper2;
+			case 'is_greater_than':
+				return oper1 + ' > ' + oper2;
+			case 'is_greater_than_or_equal':
+				return oper1 + ' >= ' + oper2;
+			case 'has_key':
+				return oper1 + '.hasOwnProperty(' + oper2 + ')';
+			case 'has_value':
+				return '_.contains(_.values(' + oper1 + '), ' + oper2 + ')';
+			default:
+				return '<comparison here>';
+		}
+	},
+
+	handleAssertions: function (request, step) {
+		var tests = '',
+			oldThis = this;
+		_.each(step.assertions, function (ass) {
+
+			var testName = '',
+				oper1 = null,
+				oper2 = '\'' + ass.value + '\'',
+				testScript = '';
+
+			// Handle source (LHS)
+			switch(ass.source) {
+				case 'response_status':
+					testName += 'Status Code is correct';
+					oper1 = 'responseCode.code';
+					break;
+				case 'response_headers':
+					// this will have a property
+					testName += '\''+ass.property+'\' Response Header is correct';
+					oper1 = 'postman.getResponseHeader(\''+ass.property+'\')';
+					break;
+				case 'response_json':
+					if(ass.property) {
+						testName += 'Response.' + ass.property + ' is correct';
+						oper1 = 'JSON.parse(responseBody).'+ass.property;
+					}
+					else {
+						testName += 'JSON Response is correct';
+						oper1 = 'JSON.parse(responseBody)';
+					}
+					break;
+				case 'response_size':
+					testName += '//';
+					break;
+				case 'response_text':
+					testName += 'Response text is correct';
+					oper1 = 'responseBody';
+					break;
+				case 'response_time':
+					testName += 'Response time is correct';
+					oper1 = 'responseTime';
+					break;
+			}
+
+			if(oper1) {
+				testScript = 'tests["' + testName + '"] = ' + oldThis.getRHSFromComparisonAndOperands(ass.comparison, oper1, oper2) + ';'
+				if(testScript.indexOf("JSON.parse") > -1) {
+					testScript = "try {\n\t" + testScript + "\n}\ncatch(e) {\n\tconsole.log(\"Could not parse JSON\");\n}"
+				}
+				tests += testScript + '\n\n';
+			}
+		});
+		request.tests = tests;
+	},
+
 	getRequestFromStep: function (step) {
 		var oldThis = this;
 
@@ -198,7 +287,7 @@ var runscopeConverterV1 = {
 
 		oldThis.handleScripts(request, step);
 
-		//oldThis.handleAssertions(request, step);
+		oldThis.handleAssertions(request, step);
 
 		return request;
 	},

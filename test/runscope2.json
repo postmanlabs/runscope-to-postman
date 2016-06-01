@@ -1,0 +1,266 @@
+{
+  "trigger_url": "https://api.runscope.com/radar/a9b309bf-e614-484c-a1ca-a720c90ac331/trigger", 
+  "name": "MY TEST NAME", 
+  "version": "1.0", 
+  "exported_at": 1464741171, 
+  "steps": [
+    {
+      "url": "http://httpbin.org/get?name=Request1", 
+      "variables": [], 
+      "args": {}, 
+      "step_type": "request", 
+      "auth": {
+        "username": "BASIC_USERNAME", 
+        "auth_type": "basic", 
+        "password": "BASIC_PASSWORD"
+      }, 
+      "note": "This is request 1", 
+      "headers": {
+        "hk2": [
+          "hv2"
+        ], 
+        "hk1": [
+          "hv1"
+        ]
+      }, 
+      "assertions": [
+        {
+          "comparison": "equal_number", 
+          "value": 200, 
+          "source": "response_status"
+        }, 
+        {
+          "comparison": "equal", 
+          "property": "headers.property", 
+          "value": "headersEquals", 
+          "source": "response_headers"
+        }, 
+        {
+          "comparison": "not_equal", 
+          "property": "headers.property", 
+          "value": "does not equalValue", 
+          "source": "response_headers"
+        }, 
+        {
+          "comparison": "empty", 
+          "property": "headers.property", 
+          "value": null, 
+          "source": "response_headers"
+        }, 
+        {
+          "comparison": "not_empty", 
+          "property": "headers.property", 
+          "value": null, 
+          "source": "response_headers"
+        }, 
+        {
+          "comparison": "contains", 
+          "property": "headers.property", 
+          "value": "containsValue", 
+          "source": "response_headers"
+        }, 
+        {
+          "comparison": "does_not_contain", 
+          "property": "headers.property", 
+          "value": "doesNotContainValue", 
+          "source": "response_headers"
+        }, 
+        {
+          "comparison": "is_a_number", 
+          "property": "headers.property", 
+          "value": null, 
+          "source": "response_headers"
+        }, 
+        {
+          "comparison": "equal_number", 
+          "property": "headers.property", 
+          "value": "equalsNumber", 
+          "source": "response_headers"
+        }, 
+        {
+          "comparison": "is_less_than", 
+          "property": "headers.property", 
+          "value": "lessThanValue", 
+          "source": "response_headers"
+        }, 
+        {
+          "comparison": "is_less_than_or_equal", 
+          "property": "headers.property", 
+          "value": "<=Value", 
+          "source": "response_headers"
+        }, 
+        {
+          "comparison": "is_greater_than", 
+          "property": "headers.property", 
+          "value": ">value", 
+          "source": "response_headers"
+        }, 
+        {
+          "comparison": "is_greater_than_or_equal", 
+          "property": "headers.property", 
+          "value": ">=value", 
+          "source": "response_headers"
+        }, 
+        {
+          "comparison": "has_key", 
+          "property": "body.property", 
+          "value": "JsonbodyHasKey", 
+          "source": "response_json"
+        }, 
+        {
+          "comparison": "has_value", 
+          "property": "body.property", 
+          "value": "JsonbodyHasValue", 
+          "source": "response_json"
+        }, 
+        {
+          "comparison": "equal_number", 
+          "value": "responseSize=", 
+          "source": "response_size"
+        }, 
+        {
+          "comparison": "equal_number", 
+          "value": "responseTime=", 
+          "source": "response_time"
+        }, 
+        {
+          "comparison": "equal_number", 
+          "value": "StatusCode=", 
+          "source": "response_status"
+        }, 
+        {
+          "comparison": "equal", 
+          "value": "TextBodyEquals", 
+          "source": "response_text"
+        }, 
+        {
+          "comparison": "equal", 
+          "property": "xmlProp", 
+          "value": "XmlProp", 
+          "source": "response_xml"
+        }
+      ], 
+      "scripts": [
+        "TEST SCRIPT 1;", 
+        "TEST SCRIPT 2;"
+      ], 
+      "fragment": "", 
+      "before_scripts": [
+        "PRESCRIPT 1", 
+        "PRE SCRIPT 2"
+      ], 
+      "data": "", 
+      "method": "GET"
+    }, 
+    {
+      "body": "RAW BODY", 
+      "form": {}, 
+      "url": "http://httpbin.org/post?uk1=uk2", 
+      "variables": [], 
+      "step_type": "request", 
+      "auth": {}, 
+      "fragment": "", 
+      "note": "", 
+      "headers": {
+        "hk2": [
+          "hv2"
+        ], 
+        "hk1": [
+          "hv1"
+        ]
+      }, 
+      "assertions": [
+        {
+          "comparison": "equal_number", 
+          "value": 200, 
+          "source": "response_status"
+        }, 
+        {
+          "comparison": "equal", 
+          "property": "args.u1", 
+          "value": "k1", 
+          "source": "response_json"
+        }
+      ], 
+      "scripts": [], 
+      "before_scripts": [], 
+      "method": "POST"
+    }, 
+    {
+      "body": "", 
+      "form": {
+        "fk1": [
+          "fv1"
+        ]
+      }, 
+      "url": "http://httpbin.org/post?uk1=uk2", 
+      "variables": [], 
+      "step_type": "request", 
+      "auth": {}, 
+      "fragment": "", 
+      "note": "", 
+      "headers": {
+        "hk2": [
+          "hv2"
+        ], 
+        "hk1": [
+          "hv1"
+        ]
+      }, 
+      "assertions": [
+        {
+          "comparison": "equal_number", 
+          "value": 200, 
+          "source": "response_status"
+        }, 
+        {
+          "comparison": "equal", 
+          "property": "args.u1", 
+          "value": "k1", 
+          "source": "response_json"
+        }
+      ], 
+      "scripts": [], 
+      "before_scripts": [], 
+      "method": "POST"
+    }, 
+    {
+      "body": "{\r\n \"JSON BODY\": true\r\n}", 
+      "form": {}, 
+      "url": "http://httpbin.org/post?uk1=uk2", 
+      "variables": [], 
+      "step_type": "request", 
+      "auth": {}, 
+      "fragment": "", 
+      "note": "", 
+      "headers": {
+        "hk2": [
+          "hv2"
+        ], 
+        "hk1": [
+          "hv1"
+        ], 
+        "Content-Type": [
+          "application/json"
+        ]
+      }, 
+      "assertions": [
+        {
+          "comparison": "equal_number", 
+          "value": 200, 
+          "source": "response_status"
+        }, 
+        {
+          "comparison": "equal", 
+          "property": "args.u1", 
+          "value": "k1", 
+          "source": "response_json"
+        }
+      ], 
+      "scripts": [], 
+      "before_scripts": [], 
+      "method": "POST"
+    }
+  ], 
+  "description": "MY TEST DESC"
+}
