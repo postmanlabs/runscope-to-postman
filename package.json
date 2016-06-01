@@ -1,6 +1,6 @@
 {
     "name": "@postmanlabs/runscope-to-postman",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "description": "Convert Runscope Radar Tests to Postman Collection v2",
     "main": "index.js",
     "publishConfig":{
