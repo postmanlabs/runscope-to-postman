@@ -165,17 +165,30 @@ var runscopeConverterV1 = {
 		if(!step.before_scripts) {
 			step.before_scripts = [];
 		}
-		request.preRequestScript = '// You will need to convert this to a ' + 
-			'Postman-compliant script\n' + 
-			step.before_scripts.join('\n');
+
+		request.preRequestScript = '';
+
+		var runscopePrScript = step.before_scripts.join('\n');
+		runscopePrScript = runscopePrScript.replace(/\n/g,'\n//');
+		if(!_.isEmpty(runscopePrScript)) {
+			request.preRequestScript = '//==== You will need to convert this to a ' + 
+				'Postman-compliant script ====\n' + 
+				'//==== (Select text and use Ctrl + / (Win) or Cmd + / (Mac) to uncomment ====\n' + 
+				'//' + runscopePrScript;
+		}
 
 
 		if(!step.scripts) {
 			step.scripts = [];
 		}
-		request.tests = '// You will need to convert this to a ' + 
-			'Postman-compliant script\n' + 
-			step.scripts.join('\n');
+		var runscopeTestScript = step.scripts.join('\n');
+		runscopeTestScript = runscopeTestScript.replace(/\n/g,'\n//');
+		if(!_.isEmpty(runscopeTestScript)) {
+			request.tests += '//==== You will need to convert this to a ' + 
+				'Postman-compliant script ====\n' + 
+				'//==== (Select text and use Ctrl + / (Win) or Cmd + / (Mac) to uncomment ====\n' + 
+				'//' + runscopeTestScript;
+		}
 	},
 
 	getRHSFromComparisonAndOperands: function(comparison, oper1, oper2) {
@@ -257,14 +270,21 @@ var runscopeConverterV1 = {
 			}
 
 			if(oper1) {
-				testScript = 'tests["' + testName + '"] = ' + oldThis.getRHSFromComparisonAndOperands(ass.comparison, oper1, oper2) + ';'
-				if(testScript.indexOf("JSON.parse") > -1) {
-					testScript = "try {\n\t" + testScript + "\n}\ncatch(e) {\n\tconsole.log(\"Could not parse JSON\");\n}"
+				testScript = 'tests["' + testName + '"] = ' + 
+					oldThis.getRHSFromComparisonAndOperands(ass.comparison, oper1, oper2) + ';';
+				if(testScript.indexOf('JSON.parse') > -1) {
+					testScript = 'try {\n\t' + testScript + '\n}\ncatch(e) {\n\t'+
+					'tests["' + testName + '"] = false;\n\t' +
+					'console.log(\"Could not parse JSON\");\n}';
 				}
 				tests += testScript + '\n\n';
 			}
 		});
-		request.tests = tests;
+
+		if(!_.isEmpty(tests)) {
+			request.tests += '//==== This section is Postman-compliant ====\n' + 
+				tests + '\n';
+		}
 	},
 
 	getRequestFromStep: function (step) {
@@ -285,9 +305,9 @@ var runscopeConverterV1 = {
 
 		oldThis.handleAuth(request, step);
 
-		oldThis.handleScripts(request, step);
-
 		oldThis.handleAssertions(request, step);
+
+		oldThis.handleScripts(request, step);		
 
 		return request;
 	},

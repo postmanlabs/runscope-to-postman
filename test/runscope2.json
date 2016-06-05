@@ -2,7 +2,7 @@
   "trigger_url": "https://api.runscope.com/radar/a9b309bf-e614-484c-a1ca-a720c90ac331/trigger", 
   "name": "MY TEST NAME", 
   "version": "1.0", 
-  "exported_at": 1464741171, 
+  "exported_at": 1465133709, 
   "steps": [
     {
       "url": "http://httpbin.org/get?name=Request1", 
@@ -182,8 +182,13 @@
           "source": "response_json"
         }
       ], 
-      "scripts": [], 
-      "before_scripts": [], 
+      "scripts": [
+        "/**\n * TTTTTScript for request 2\n**/\n\n//Hello\n\nvar a = \"actual script line\";"
+      ], 
+      "before_scripts": [
+        "/**\n * Script for request 2\n**/\n\n//Hello\n\nvar a = \"actual script line\";", 
+        "/**\n * Script for request 2.1\n**/\n\n//Hello.1\n\nvar a = \"actual script line.1\";"
+      ], 
       "method": "POST"
     }, 
     {
