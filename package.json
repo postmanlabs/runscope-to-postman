@@ -19,7 +19,7 @@
     ],
     "dependencies": {
         "lodash": "^3.10.1",
-        "node-uuid": "1.4.1",
+        "node-uuid": "1.4.7",
         "postman-collection": "0.1.0"
     },
     "devDependencies": {
