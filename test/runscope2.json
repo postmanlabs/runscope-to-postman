@@ -151,7 +151,11 @@
       ], 
       "data": "", 
       "method": "GET"
-    }, 
+    },
+    {
+      "duration": 20,
+      "step_type": "pause"
+    },
     {
       "body": "RAW BODY", 
       "form": {}, 
