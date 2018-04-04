@@ -19,8 +19,7 @@
   ],
   "dependencies": {
     "lodash": ">=4.17.5",
-    "uuid": ">=3.2.1",
-    "postman-collection": "0.1.0"
+    "uuid": ">=3.2.1"
   },
   "devDependencies": {
     "expect.js": "^0.3.1",
