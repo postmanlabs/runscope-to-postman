@@ -1,6 +1,6 @@
 {
   "name": "@postman/runscope-to-postman",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Convert Runscope Radar Tests to Postman Collection v2",
   "main": "index.js",
   "publishConfig": {
@@ -18,8 +18,8 @@
     "postman"
   ],
   "dependencies": {
-    "lodash": "^3.10.1",
-    "node-uuid": "1.4.7",
+    "lodash": ">=4.17.5",
+    "uuid": ">=3.2.1",
     "postman-collection": "0.1.0"
   },
   "devDependencies": {
