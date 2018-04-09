@@ -1,6 +1,6 @@
 var _ = require('lodash'),
 	//SDK = require('postman-collection'),
-	uuid = require('node-uuid');
+	uuidv4 = require('uuid/v4');
 
 // var runscopeConverterV2 = {
 // 	validateRunscope: function (runscopeJson) {
@@ -93,7 +93,7 @@ var runscopeConverterV1 = {
 
 	initCollection: function (runscopeJson) {
 		return {
-			id: uuid.v4(),
+			id: uuidv4(),
 			name: runscopeJson.name,
 			description: runscopeJson.description,
 			order: [],
@@ -291,7 +291,7 @@ var runscopeConverterV1 = {
 		var oldThis = this;
 
 		var request = {
-			id: uuid.v4(),
+			id: uuidv4(),
 			url: step.url,
 			headers: oldThis.getPostmanHeadersFromRunscopeHeaders(step.headers),
 			pathVariables: {},
