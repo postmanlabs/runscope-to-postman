@@ -173,7 +173,7 @@ var runscopeConverterV1 = {
 
     var runscopePrScript = [];
     step.before_scripts.forEach(function(element) {
-      runscopePrScript.push(...element.split('/\n/g'));
+      runscopePrScript.push.apply(element.split('/\n/g'));
     });
     if (!_.isEmpty(runscopePrScript)) {
       var prScript = {
@@ -183,14 +183,14 @@ var runscopeConverterV1 = {
           exec: []
         }
       };
-      prScript.script.exec.push(
-        ...[
+      prScript.script.exec.push.apply(
+        [
           '//==== You will need to convert this to a Postman-compliant script ====\n',
           '//==== (Select text and use Ctrl + / (Win) or Cmd + / (Mac) to uncomment ====\n',
           '//'
         ]
       );
-      runscopePrScript.forEach(element => {
+      runscopePrScript.forEach(function(element)  {
         prScript.script.exec.push('//' + element);
       });
       event.push(prScript);
@@ -202,7 +202,7 @@ var runscopeConverterV1 = {
     }
     var runscopeTestScript = [];
     step.scripts.forEach(function(element) {
-      runscopeTestScript.push(...element.split('/\n/g'));
+      runscopeTestScript.push.apply(element.split('/\n/g'));
     });
 
     if (!_.isEmpty(runscopeTestScript)) {
@@ -210,33 +210,33 @@ var runscopeConverterV1 = {
         return o.listen == 'test';
       });
       if (eventIndex === -1) {
-        var prScript = {
+        var testScript = {
           listen: 'test',
           script: {
             type: 'text/javascript',
             exec: []
           }
         };
-        prScript.script.exec.push(
-          ...[
+        testScript.script.exec.push.apply(
+          [
             '//==== You will need to convert this to a Postman-compliant script ====\n',
             '//==== (Select text and use Ctrl + / (Win) or Cmd + / (Mac) to uncomment ====\n',
             '//'
           ]
         );
-        runscopeTestScript.forEach(element => {
-          prScript.script.exec.push('//' + element);
+        runscopeTestScript.forEach(function(element) {
+          testScript.script.exec.push('//' + element);
         });
-        event.push(prScript);
+        event.push(testScript);
       } else {
-        event[eventIndex].script.exec.push(
-          ...[
+        event[eventIndex].script.exec.push.apply(
+          [
             '//==== You will need to convert this to a Postman-compliant script ====\n',
             '//==== (Select text and use Ctrl + / (Win) or Cmd + / (Mac) to uncomment ====\n',
             '//'
           ]
         );
-        runscopeTestScript.forEach(element => {
+        runscopeTestScript.forEach(function(element)  {
           event[eventIndex].script.exec.push('//' + element);
         });
       }
@@ -283,7 +283,7 @@ var runscopeConverterV1 = {
     _.each(step.assertions, function(ass) {
       var testName = '',
         oper1 = null,
-        oper2 = "'" + ass.value + "'",
+        oper2 = '"' + ass.value + '"',
         testScript = '';
 
       // Handle source (LHS)
@@ -294,8 +294,8 @@ var runscopeConverterV1 = {
           break;
         case 'response_headers':
           // this will have a property
-          testName += "'" + ass.property + "' Response Header is correct";
-          oper1 = "postman.getResponseHeader('" + ass.property + "')";
+          testName += '"' + ass.property + '" Response Header is correct';
+          oper1 = 'postman.getResponseHeader("' + ass.property + '")';
           break;
         case 'response_json':
           if (ass.property) {
@@ -355,7 +355,7 @@ var runscopeConverterV1 = {
       varEvent.script.exec.push(
         '//==== This section is Postman-compliant ====\n'
       );
-      tests.forEach(element => {
+      tests.forEach(function(element){
         varEvent.script.exec.push(element);
       });
       event.push(varEvent);
@@ -406,7 +406,7 @@ var runscopeConverterV1 = {
 module.exports = {
   validate: function(runscopeJson) {
     try {
-      var collection = runscopeConverterV1.validateRunscope(runscopeJson);
+      runscopeConverterV1.validateRunscope(runscopeJson);
       return {
         result: true
       };
