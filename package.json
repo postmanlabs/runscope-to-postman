@@ -3,11 +3,72 @@
   "version": "0.0.7",
   "description": "Convert Runscope Radar Tests to Postman Collection v2",
   "main": "index.js",
+  "com_postman_plugin": {
+    "plugin_type": "importer",
+    "name": "runscope",
+    "source_format": "runscope",
+    "sample_input": {
+      "trigger_url": "https://api.runscope.com/radar/token_number/trigger", 
+      "name": "plugintest", 
+      "version": "1.0", 
+      "exported_at": 1533892177, 
+      "steps": [
+        {
+          "body": "", 
+          "skipped": false, 
+          "form": {
+            "form param1": [
+              "forma value1"
+            ]
+          }, 
+          "headers": {
+            "header1": [
+              "value1"
+            ]
+          }, 
+          "fragment": "", 
+          "variables": [], 
+          "args": {}, 
+          "step_type": "request", 
+          "auth": {
+            "username": "basic_user", 
+            "auth_type": "basic", 
+            "password": "Basic_passw"
+          }, 
+          "multipart_form": [], 
+          "note": "", 
+          "url": "https://yourapihere.com/hai/hello?param1=value1", 
+          "assertions": [
+            {
+              "comparison": "equal_number", 
+              "value": 200, 
+              "source": "response_status"
+            }, 
+            {
+              "comparison": "equal_number", 
+              "value": "80", 
+              "source": "response_size"
+            }
+          ], 
+          "scripts": [
+            "var test='testScript';"
+          ], 
+          "before_scripts": [
+            "var pre='prerequest Script';"
+          ], 
+          "data": "", 
+          "method": "POST"
+        }
+      ], 
+      "description": "used to test plugintest\r\n"
+    }
+  },
   "publishConfig": {
     "registry": "https://npm.postmanlabs.com"
   },
   "scripts": {
-    "test": "scripts/test.sh"
+    "test": "scripts/test.sh",
+    "test-unit":"scripts/test-unit.sh"
   },
   "repository": {
     "type": "git",
