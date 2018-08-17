@@ -7,7 +7,9 @@
     "registry": "https://npm.postmanlabs.com"
   },
   "scripts": {
-    "test": "scripts/test.sh"
+    "test": "scripts/test.sh",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "repository": {
     "type": "git",
@@ -19,14 +21,16 @@
   ],
   "dependencies": {
     "lodash": "^4.17.5",
-    "uuid": "^3.2.1"
+    "uuid": "^3.2.1",
+    "snyk": "^1.91.0"
   },
   "devDependencies": {
     "expect.js": "^0.3.1",
     "jscs": "^2.1.0",
     "jshint": "^2.8.0",
-    "mocha": "^2.2.5"
+    "mocha": "^4.0.0"
   },
   "author": "Postman Labs",
-  "license": "MIT"
+  "license": "MIT",
+  "snyk": true
 }
