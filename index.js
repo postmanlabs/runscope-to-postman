@@ -1,91 +1,19 @@
 var _ = require('lodash'),
+  fs=require('fs'),
   SDK = require('postman-collection');
-  //uuidv4 = require('uuid/v4');
-
-// var runscopeConverterV2 = {
-// 	validateRunscope: function (runscopeJson) {
-// 		//validate
-// 		if (typeof runscopeJson === 'string') {
-// 			runscopeJson = JSON.parse(runscopeJson);
-// 		}
-
-// 		if (runscopeJson.hasOwnProperty('name') &&
-// 			runscopeJson.hasOwnProperty('trigger_url')) {
-// 			return runscopeJson;
-// 		}
-// 		else {
-// 			throw {
-// 				'message': 'Not a runscope test'
-// 			};
-// 		}
-// 	},
-
-// 	getHeadersForStep: function (runscopeJson, step) {
-// 		var retVal = [];
-// 		for (var prop in step) {
-// 			if (step.hasOwnProperty(prop)) {
-// 				retVal.push(new SDK.Header({
-// 					key: prop,
-// 					value: step[prop][0]
-// 				}));
-// 			}
-// 		}
-// 		return retVal;
-// 	},
-
-// 	getRequestsFromSteps: function (runscopeJson) {
-// 		var oldThis = this;
-// 		return _.map(runscopeJson.steps, function(step) {
-// 			console.log('URL: ' + step.url);
-// 			var r = new SDK.Request({
-// 				url: step.url,
-// 				method: step.method
-// 			});
-// 			r.headers = oldThis.getHeadersForStep(runscopeJson, step);
-// 			return r;
-// 		});
-// 	},
-
-// 	convert: function (runscopeJson) {
-// 		var oldThis = this;
-// 		runscopeJson = oldThis.validateRunscope(runscopeJson);
-// 		var collection = new SDK.Collection({
-// 			info: {
-// 				name: runscopeJson.name,
-// 				description: runscopeJson.description
-// 			}
-// 		});
-
-// 		var items = oldThis.getRequestsFromSteps(runscopeJson);
-// 		_.each(items, function (rItem) {
-// 			var cItem = new SDK.Item({
-// 				id: uuid.v4(),
-// 				version: '1.0.0',
-// 				name: rItem.name,
-// 				request: rItem
-// 			});
-// 			console.log('Added request: ' , rItem.toJSON());
-// 			collection.items.add(cItem);
-// 		});
-// 		//console.log(JSON.stringify(collection));
-// 	}
-// };
 
 var runscopeConverterV1 = {
-  validateRunscope: function(runscopeJson) {
-    //validate
-    if (typeof runscopeJson === 'string') {
-      runscopeJson = JSON.parse(runscopeJson);
+  //validate
+  validate: function(runscopeJson) {
+    if(! runscopeJson.trigger_url || !runscopeJson.name || !runscopeJson.steps){
+      return {
+        result:false,
+        reason:'not a valid runscope file (might not contain trigger_url or name or steps properties )'
+      };
     }
-
-    if (
-      runscopeJson.hasOwnProperty('name') &&
-      runscopeJson.hasOwnProperty('trigger_url')
-    ) {
-      return runscopeJson;
-    } else {
-      throw {
-        message: 'Not a runscope test'
+    else{
+      return {
+        result:true
       };
     }
   },
@@ -157,13 +85,6 @@ var runscopeConverterV1 = {
       request.body.urlencoded = formArray;
     }
   },
-
-  // handleAssertions: function (request, step) {
-  // 	var tests = '';
-  // 	_.each(step.assertions, function(ass) {
-  // 	});
-  // 	return tests;
-  // },
 
   handleScripts: function(event, step) {
     //pre-request scripts in postman
@@ -392,7 +313,7 @@ var runscopeConverterV1 = {
 
   convert: function(runscopeJson) {
     var oldThis = this;
-    runscopeJson = this.validateRunscope(runscopeJson);
+    // runscopeJson = this.validate(runscopeJson);
     var collection = this.initCollection(runscopeJson);
 
     _.each(runscopeJson.steps, function(step) {
@@ -404,30 +325,56 @@ var runscopeConverterV1 = {
 };
 
 module.exports = {
-  validate: function(runscopeJson) {
+  validate: function(input) {
     try {
-      runscopeConverterV1.validateRunscope(runscopeJson);
-      return {
-        result: true
-      };
+      var data;
+      if(input.type === 'string'){
+        data=JSON.parse(input.data);
+        return runscopeConverterV1.validate(data);
+      }
+      else if(input.type === 'file'){
+        data=fs.readFileSync(input.data).toString();
+        data=JSON.parse(input.data);
+       return runscopeConverterV1.validate(data);
+      }
+      else if(input.type === 'json'){
+        return runscopeConverterV1.validate(input.data);
+      }
+      else{
+        throw 'input type is not valid';
+      }
     } catch (e) {
       return {
         result: false,
-        reason: e
+        reason: e.toString()
       };
     }
   },
-  convert: function(runscopeJson, cb) {
+  convert: function(input, options,cb) {
     var conversionResult;
     var check = false;
     try {
-      conversionResult = runscopeConverterV1.convert(runscopeJson);
+      var data;
+      if(input.type === 'string'){
+        data=JSON.parse(input.data);
+      }
+      else if(input.type === 'file'){
+        data=fs.readFileSync(input.data).toString();
+        data=JSON.parse(input.data);
+      }
+      else if(input.type === 'json'){
+        data=input.data;
+      }
+      else{
+        throw 'input type is not valid';
+      }
+      conversionResult = runscopeConverterV1.convert(data);
       check = true;
     } catch (e) {
       console.log(e);
-      cb(e, {
+      cb(null, {
         result: false,
-        reason: e
+        reason: e.toString()
       });
     }
     if (check) {

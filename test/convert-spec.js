@@ -6,8 +6,12 @@ var expect = require('expect.js'),
 describe('the converter', function () {
     it('must convert a basic runcope file', function () {
         var runscopeJson = fs.readFileSync('test/runscope2.json').toString();
-        	//console.log(JSON.stringify(convertedString, null, 2))
-        converter.convert(runscopeJson, function(
+            //console.log(JSON.stringify(convertedString, null, 2))
+            var input={
+                type:'string',
+                data:runscopeJson
+            };
+        converter.convert(input,{}, function(
             err,
             convertedString
           ) {
