@@ -72,6 +72,7 @@
   },
   "scripts": {
     "test": "scripts/test.sh",
+    "test-lint":"scripts/test-lint.sh",
     "test-unit": "scripts/test-unit.sh"
   },
   "repository": {
