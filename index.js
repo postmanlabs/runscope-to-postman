@@ -414,8 +414,8 @@ module.exports = {
       });
     }
     catch (e) {
-      console.log(e);
-      cb(null, {
+
+      return cb(null, {
         result: false,
         reason: e.toString()
       });
