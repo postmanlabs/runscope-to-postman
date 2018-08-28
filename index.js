@@ -1,328 +1,424 @@
 var _ = require('lodash'),
-	//SDK = require('postman-collection'),
-	uuidv4 = require('uuid/v4');
+  fs = require('fs'),
+  SDK = require('postman-collection'),
 
-// var runscopeConverterV2 = {
-// 	validateRunscope: function (runscopeJson) {
-// 		//validate
-// 		if (typeof runscopeJson === 'string') {
-// 			runscopeJson = JSON.parse(runscopeJson);
-// 		}
+  runscopeConverterV1 = {
+  //validate
+    validate: function(runscopeJson) {
+      if (!runscopeJson.trigger_url || !runscopeJson.name || !runscopeJson.steps) {
+        return {
+          result: false,
+          reason: 'not a valid runscope file (might not contain trigger_url or name or steps properties )'
+        };
+      }
 
-// 		if (runscopeJson.hasOwnProperty('name') && 
-// 			runscopeJson.hasOwnProperty('trigger_url')) {
-// 			return runscopeJson;
-// 		}
-// 		else {
-// 			throw {
-// 				'message': 'Not a runscope test'
-// 			};
-// 		}
-// 	},
+      return {
+        result: true
+      };
 
-// 	getHeadersForStep: function (runscopeJson, step) {
-// 		var retVal = [];
-// 		for (var prop in step) {
-// 			if (step.hasOwnProperty(prop)) {
-// 				retVal.push(new SDK.Header({
-// 					key: prop,
-// 					value: step[prop][0]
-// 				}));
-// 			}
-// 		}
-// 		return retVal;
-// 	},
+    },
 
-// 	getRequestsFromSteps: function (runscopeJson) {
-// 		var oldThis = this;
-// 		return _.map(runscopeJson.steps, function(step) {
-// 			console.log('URL: ' + step.url);
-// 			var r = new SDK.Request({
-// 				url: step.url,
-// 				method: step.method
-// 			});
-// 			r.headers = oldThis.getHeadersForStep(runscopeJson, step);
-// 			return r;
-// 		});
-// 	},
+    initCollection: function(runscopeJson) {
+      return {
+        info: {
+          name: runscopeJson.name,
+          description: runscopeJson.description,
+          schema:
+          'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'
+        },
+        item: []
+      };
+    },
 
-// 	convert: function (runscopeJson) {
-// 		var oldThis = this;
-// 		runscopeJson = oldThis.validateRunscope(runscopeJson);
-// 		var collection = new SDK.Collection({
-// 			info: {
-// 				name: runscopeJson.name,
-// 				description: runscopeJson.description
-// 			}
-// 		});
+    getPostmanHeadersFromRunscopeHeaders: function(runscopeHeaders) {
+      var headers = [],
+        key;
 
+      for (key in runscopeHeaders) {
+        if (runscopeHeaders.hasOwnProperty(key)) {
+          headers.push({
+            key: key,
+            value: runscopeHeaders[key][0]
+          });
+        }
+      }
 
-// 		var items = oldThis.getRequestsFromSteps(runscopeJson);
-// 		_.each(items, function (rItem) {
-// 			var cItem = new SDK.Item({
-// 				id: uuid.v4(),
-// 				version: '1.0.0',
-// 				name: rItem.name,
-// 				request: rItem
-// 			});
-// 			console.log('Added request: ' , rItem.toJSON());
-// 			collection.items.add(cItem);
-// 		});
-// 		//console.log(JSON.stringify(collection));
-// 	}
-// };
+      return headers;
+    },
 
+    addRequest: function(collection, request) {
+      collection.item.push(request);
+    },
 
-var runscopeConverterV1 = {
-	validateRunscope: function (runscopeJson) {
-		//validate
-		if(typeof runscopeJson === 'string') {
-			runscopeJson = JSON.parse(runscopeJson);
-		}
+    handleAuth: function(request, step) {
+      if (step.auth.auth_type === 'basic') {
+        request.auth = {};
+        request.auth.type = 'basic';
+        request.auth.basic = [];
+        request.auth.basic[0] = {
+          key: 'password',
+          value: step.auth.password,
+          type: 'string'
+        };
+        request.auth.basic[1] = {
+          key: 'username',
+          value: step.auth.username,
+          type: 'string'
+        };
+      }
+    //no other auth types supported yet
+    //do oauth1 next
+    },
 
-		if(runscopeJson.hasOwnProperty('name') && 
-			runscopeJson.hasOwnProperty('trigger_url')) {
-			return runscopeJson;
-		}
-		else {
-			throw {
-				'message': 'Not a runscope test'
-			};
-		}
-	},
+    handleData: function(request, step) {
+      if (typeof step.body === 'string' && JSON.stringify(step.form) === '{}') {
+        request.body.mode = 'raw';
+        request.body.raw = step.body;
+      }
+      else if (step.form) {
+        request.body.mode = 'urlencoded';
+        var formArray = [],
+          key;
 
-	initCollection: function (runscopeJson) {
-		return {
-			id: uuidv4(),
-			name: runscopeJson.name,
-			description: runscopeJson.description,
-			order: [],
-			folders: [],
-			requests: [],
-			timestamp: (new Date()).getTime()
-		};
-	},
+        for (key in step.form) {
+          if (step.form.hasOwnProperty(key)) {
+            formArray.push({
+              key: key,
+              value: step.form[key][0]
+            });
+          }
+        }
+        request.body.urlencoded = formArray;
+      }
+    },
 
-	getPostmanHeadersFromRunscopeHeaders: function (runscopeHeaders) {
-		var str = '';
-		for(var key in runscopeHeaders) {
-			if(runscopeHeaders.hasOwnProperty(key)) {
-				str += key+':'+runscopeHeaders[key]+'\n';
-			}
-		}
-		return str;
-	},
+    handleScripts: function(event, step) {
+    //pre-request scripts in postman
+      if (!step.before_scripts) {
+        step.before_scripts = [];
+      }
 
-	addRequest: function (collection, request) {
-		collection.order.push(request.id);
-		request.collectionId = collection.id;
-		collection.requests.push(request);
-	},
+      var runscopePrScript = [],
+        eventIndex,
+        testScript,
+        prScript,
+        runscopeTestScript;
 
-	handleAuth: function (request, step) {
-		if(step.auth.auth_type === 'basic') {
-			request.currentHelper = 'basicAuth';
-			request.helperAttributes = {
-				id: 'basic',
-				saveToRequest: true,
-				username: step.auth.username,
-				password: step.auth.password,
-			};
-		}
-		//no other auth types supported yet
-		//do oauth1 next
-	},
+      step.before_scripts.forEach(function(element) {
+        runscopePrScript.push.apply(element.split('/\n/g'));
+      });
+      if (!_.isEmpty(runscopePrScript)) {
+        prScript = {
+          listen: 'prerequest',
+          script: {
+            type: 'text/javascript',
+            exec: []
+          }
+        };
 
-	handleData: function (request, step) {
-		if((typeof step.body === 'string') && JSON.stringify(step.form) == '{}') {
-			request.dataMode = 'raw';
-			request.data = step.body;
-		}
+        prScript.script.exec.push.apply(
+          [
+            '//==== You will need to convert this to a Postman-compliant script ====\n',
+            '//==== (Select text and use Ctrl + / (Win) or Cmd + / (Mac) to uncomment ====\n',
+            '//'
+          ]
+        );
+        runscopePrScript.forEach(function(element) {
+          prScript.script.exec.push('//' + element);
+        });
+        event.push(prScript);
+      }
 
-		else if(step.form) {
-			request.dataMode = 'urlencoded';
-			var formArray = [];
-			for(var key in step.form) {
-				if(step.form.hasOwnProperty(key)) {
-					formArray.push({
-						key: key,
-						value: step.form[key][0]
-					});
-				}
-			}
-			request.data = formArray;
-		}
-	},
+      //tests in postman
+      if (!step.scripts) {
+        step.scripts = [];
+      }
+      runscopeTestScript = [];
 
-	// handleAssertions: function (request, step) {
-	// 	var tests = '';
-	// 	_.each(step.assertions, function(ass) {
-	// 	});
-	// 	return tests;
-	// },
+      step.scripts.forEach(function(element) {
+        runscopeTestScript.push.apply(element.split('/\n/g'));
+      });
 
-	handleScripts: function (request, step) {
-		if(!step.before_scripts) {
-			step.before_scripts = [];
-		}
+      if (!_.isEmpty(runscopeTestScript)) {
+        eventIndex = _.findIndex(event, function(o) {
+          return o.listen === 'test';
+        });
 
-		request.preRequestScript = '';
+        if (eventIndex === -1) {
+          testScript = {
+            listen: 'test',
+            script: {
+              type: 'text/javascript',
+              exec: []
+            }
+          };
 
-		var runscopePrScript = step.before_scripts.join('\n');
-		runscopePrScript = runscopePrScript.replace(/\n/g,'\n//');
-		if(!_.isEmpty(runscopePrScript)) {
-			request.preRequestScript = '//==== You will need to convert this to a ' + 
-				'Postman-compliant script ====\n' + 
-				'//==== (Select text and use Ctrl + / (Win) or Cmd + / (Mac) to uncomment ====\n' + 
-				'//' + runscopePrScript;
-		}
+          testScript.script.exec.push.apply(
+            [
+              '//==== You will need to convert this to a Postman-compliant script ====\n',
+              '//==== (Select text and use Ctrl + / (Win) or Cmd + / (Mac) to uncomment ====\n',
+              '//'
+            ]
+          );
+          runscopeTestScript.forEach(function(element) {
+            testScript.script.exec.push('//' + element);
+          });
+          event.push(testScript);
+        }
+        else {
+          event[eventIndex].script.exec.push.apply(
+            [
+              '//==== You will need to convert this to a Postman-compliant script ====\n',
+              '//==== (Select text and use Ctrl + / (Win) or Cmd + / (Mac) to uncomment ====\n',
+              '//'
+            ]
+          );
+          runscopeTestScript.forEach(function(element) {
+            event[eventIndex].script.exec.push('//' + element);
+          });
+        }
+      }
+    },
 
+    getRHSFromComparisonAndOperands: function(comparison, oper1, oper2) {
+      switch (comparison) {
+        case 'equal_number':
+        case 'equal':
+          return oper1 + ' == ' + oper2;
+        case 'not_equal':
+          return oper1 + '!=' + oper2;
+        case 'empty':
+          return '_.isEmpty(' + oper1 + ')';
+        case 'not_empty':
+          return '!_.isEmpty(' + oper1 + ')';
+        case 'contains':
+          return '_.contains(' + oper1 + ')';
+        case 'does_not_contain':
+          return '!_.contains(' + oper1 + ')';
+        case 'is_a_number':
+          return '!isNaN(' + oper1 + ')';
+        case 'is_less_than':
+          return oper1 + ' < ' + oper2;
+        case 'is_less_than_or_equal':
+          return oper1 + ' <= ' + oper2;
+        case 'is_greater_than':
+          return oper1 + ' > ' + oper2;
+        case 'is_greater_than_or_equal':
+          return oper1 + ' >= ' + oper2;
+        case 'has_key':
+          return oper1 + '.hasOwnProperty(' + oper2 + ')';
+        case 'has_value':
+          return '_.contains(_.values(' + oper1 + '), ' + oper2 + ')';
+        default:
+          return '<comparison here>';
+      }
+    },
 
-		if(!step.scripts) {
-			step.scripts = [];
-		}
-		var runscopeTestScript = step.scripts.join('\n');
-		runscopeTestScript = runscopeTestScript.replace(/\n/g,'\n//');
-		if(!_.isEmpty(runscopeTestScript)) {
-			request.tests += '//==== You will need to convert this to a ' + 
-				'Postman-compliant script ====\n' + 
-				'//==== (Select text and use Ctrl + / (Win) or Cmd + / (Mac) to uncomment ====\n' + 
-				'//' + runscopeTestScript;
-		}
-	},
+    handleAssertions: function(event, step) {
+      var tests = [],
+        oldThis = this,
+        varEvent;
 
-	getRHSFromComparisonAndOperands: function(comparison, oper1, oper2) {
-		switch(comparison) {
-			case 'equal_number':
-			case 'equal':
-				return oper1 + ' == ' + oper2;
-			case 'not_equal':
-				return oper1 + '!=' + oper2;
-			case 'empty':
-				return '_.isEmpty(' + oper1 + ')';
-			case 'not_empty':
-				return '!_.isEmpty(' + oper1 + ')';
-			case 'contains':
-				return '_.contains(' + oper1 + ')';
-			case 'does_not_contain':
-				return '!_.contains(' + oper1 + ')';
-			case 'is_a_number':
-				return '!isNaN('+oper1+')';
-			case 'is_less_than':
-				return oper1 + ' < ' + oper2;
-			case 'is_less_than_or_equal':
-				return oper1 + ' <= ' + oper2;
-			case 'is_greater_than':
-				return oper1 + ' > ' + oper2;
-			case 'is_greater_than_or_equal':
-				return oper1 + ' >= ' + oper2;
-			case 'has_key':
-				return oper1 + '.hasOwnProperty(' + oper2 + ')';
-			case 'has_value':
-				return '_.contains(_.values(' + oper1 + '), ' + oper2 + ')';
-			default:
-				return '<comparison here>';
-		}
-	},
+      _.each(step.assertions, function(ass) {
+        var testName = '',
+          oper1 = null,
+          oper2 = '"' + ass.value + '"',
+          testScript = '';
 
-	handleAssertions: function (request, step) {
-		var tests = '',
-			oldThis = this;
-		_.each(step.assertions, function (ass) {
+        // Handle source (LHS)
+        switch (ass.source) {
+          case 'response_status':
+            testName += 'Status Code is correct';
+            oper1 = 'responseCode.code';
+            break;
+          case 'response_headers':
+          // this will have a property
+            testName += '"' + ass.property + '" Response Header is correct';
+            oper1 = 'postman.getResponseHeader("' + ass.property + '")';
+            break;
+          case 'response_json':
+            if (ass.property) {
+              testName += 'Response.' + ass.property + ' is correct';
+              oper1 = 'JSON.parse(responseBody).' + ass.property;
+            }
+            else {
+              testName += 'JSON Response is correct';
+              oper1 = 'JSON.parse(responseBody)';
+            }
+            break;
+          case 'response_size':
+            testName += '//';
+            break;
+          case 'response_text':
+            testName += 'Response text is correct';
+            oper1 = 'responseBody';
+            break;
+          case 'response_time':
+            testName += 'Response time is correct';
+            oper1 = 'responseTime';
+            break;
+          default:break;
+        }
 
-			var testName = '',
-				oper1 = null,
-				oper2 = '\'' + ass.value + '\'',
-				testScript = '';
+        if (oper1) {
+          testScript =
+          'tests["' +
+          testName +
+          '"] = ' +
+          oldThis.getRHSFromComparisonAndOperands(
+            ass.comparison,
+            oper1,
+            oper2
+          ) +
+          ';';
+          if (testScript.indexOf('JSON.parse') > -1) {
+            testScript =
+            'try {\n\t' +
+            testScript +
+            '\n}\ncatch(e) {\n\t' +
+            'tests["' +
+            testName +
+            '"] = false;\n\t' +
+            'console.log("Could not parse JSON");\n}';
+          }
+          tests.push(testScript);
+        }
+      });
 
-			// Handle source (LHS)
-			switch(ass.source) {
-				case 'response_status':
-					testName += 'Status Code is correct';
-					oper1 = 'responseCode.code';
-					break;
-				case 'response_headers':
-					// this will have a property
-					testName += '\''+ass.property+'\' Response Header is correct';
-					oper1 = 'postman.getResponseHeader(\''+ass.property+'\')';
-					break;
-				case 'response_json':
-					if(ass.property) {
-						testName += 'Response.' + ass.property + ' is correct';
-						oper1 = 'JSON.parse(responseBody).'+ass.property;
-					}
-					else {
-						testName += 'JSON Response is correct';
-						oper1 = 'JSON.parse(responseBody)';
-					}
-					break;
-				case 'response_size':
-					testName += '//';
-					break;
-				case 'response_text':
-					testName += 'Response text is correct';
-					oper1 = 'responseBody';
-					break;
-				case 'response_time':
-					testName += 'Response time is correct';
-					oper1 = 'responseTime';
-					break;
-			}
+      if (!_.isEmpty(tests)) {
+        varEvent = {
+          listen: 'test',
+          script: {
+            type: 'text/javascript',
+            exec: []
+          }
+        };
 
-			if(oper1) {
-				testScript = 'tests["' + testName + '"] = ' + 
-					oldThis.getRHSFromComparisonAndOperands(ass.comparison, oper1, oper2) + ';';
-				if(testScript.indexOf('JSON.parse') > -1) {
-					testScript = 'try {\n\t' + testScript + '\n}\ncatch(e) {\n\t'+
-					'tests["' + testName + '"] = false;\n\t' +
-					'console.log(\"Could not parse JSON\");\n}';
-				}
-				tests += testScript + '\n\n';
-			}
-		});
+        varEvent.script.exec.push(
+          '//==== This section is Postman-compliant ====\n'
+        );
+        tests.forEach(function(element) {
+          varEvent.script.exec.push(element);
+        });
+        event.push(varEvent);
+      }
+    },
 
-		if(!_.isEmpty(tests)) {
-			request.tests += '//==== This section is Postman-compliant ====\n' + 
-				tests + '\n';
-		}
-	},
+    getRequestFromStep: function(step) {
+      var oldThis = this,
+        item = {
+          name: step.url,
+          event: [],
+          request: {
+            method: step.method,
+            header: oldThis.getPostmanHeadersFromRunscopeHeaders(step.headers),
+            body: {},
+            url: {
+              raw: step.url
+            },
+            description: step.note
+          },
+          response: []
+        };
 
-	getRequestFromStep: function (step) {
-		var oldThis = this;
+      item.request.url = SDK.Url.parse(item.request.url.raw);
+      oldThis.handleData(item.request, step);
 
-		var request = {
-			id: uuidv4(),
-			url: step.url,
-			headers: oldThis.getPostmanHeadersFromRunscopeHeaders(step.headers),
-			pathVariables: {},
-			method: step.method,
-			name: step.url,
-			description: step.note,
-			tests: ''
-		};
+      oldThis.handleAuth(item.request, step);
 
-		oldThis.handleData(request, step);
+      oldThis.handleAssertions(item.event, step);
 
-		oldThis.handleAuth(request, step);
+      oldThis.handleScripts(item.event, step);
 
-		oldThis.handleAssertions(request, step);
+      return item;
+    },
 
-		oldThis.handleScripts(request, step);		
+    convert: function(runscopeJson, cb) {
+      try {
+        var oldThis = this,
+          // runscopeJson = this.validate(runscopeJson);
+          collection = this.initCollection(runscopeJson);
 
-		return request;
-	},
+        _.each(runscopeJson.steps, function(step) {
+          oldThis.addRequest(collection, oldThis.getRequestFromStep(step));
+        });
 
-	convert: function (runscopeJson) {
-		var oldThis = this;
-		runscopeJson = this.validateRunscope(runscopeJson);
-		var collection = this.initCollection(runscopeJson);
+        return cb(null, {
+          result: true,
+          output: [{
+            type: 'collection',
+            data: collection
+          }]
+        });
+      }
+      catch (e) {
+        return cb(e);
+      }
+    }
+  };
 
-		_.each(runscopeJson.steps, function(step) {
-			oldThis.addRequest(collection, oldThis.getRequestFromStep(step));
-		});
+module.exports = {
+  validate: function(input) {
+    try {
+      var data;
 
-		return collection;
-	}
+      if (input.type === 'string') {
+        data = JSON.parse(input.data);
+
+        return runscopeConverterV1.validate(data);
+      }
+      else if (input.type === 'file') {
+        data = fs.readFileSync(input.data).toString();
+        data = JSON.parse(input.data);
+
+        return runscopeConverterV1.validate(data);
+      }
+      else if (input.type === 'json') {
+        return runscopeConverterV1.validate(input.data);
+      }
+
+      return ({
+        result: false,
+        reason: 'input type is not valid'
+      });
+
+    }
+    catch (e) {
+      return {
+        result: false,
+        reason: e.toString()
+      };
+    }
+  },
+  convert: function(input, options, cb) {
+    try {
+      if (input.type === 'string') {
+        return runscopeConverterV1.convert(JSON.parse(input.data), cb);
+      }
+      else if (input.type === 'file') {
+        return fs.readFile(input.data, function(err, data) {
+          if (err) {
+            return cb(err);
+          }
+
+          return runscopeConverterV1.convert(JSON.parse(data), cb);
+        });
+      }
+      else if (input.type === 'json') {
+        return runscopeConverterV1.convert(input.data, cb);
+      }
+
+      return cb({
+        result: false,
+        reason: 'input type is not valid'
+      });
+    }
+    catch (e) {
+
+      return cb(null, {
+        result: false,
+        reason: e.toString()
+      });
+    }
+  }
 };
-
-module.exports = runscopeConverterV1;
