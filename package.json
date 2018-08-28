@@ -72,7 +72,7 @@
   },
   "scripts": {
     "test": "scripts/test.sh",
-    "test-lint":"scripts/test-lint.sh",
+    "test-lint": "scripts/test-lint.sh",
     "test-unit": "scripts/test-unit.sh"
   },
   "repository": {
@@ -86,7 +86,7 @@
   "dependencies": {
     "istanbul": "0.4.5",
     "lodash": "4.17.5",
-    "postman-collection": "3.1.1",
+    "postman-collection": "3.2.0",
     "uuid": "3.2.1"
   },
   "devDependencies": {
