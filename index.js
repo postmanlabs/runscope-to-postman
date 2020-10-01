@@ -120,14 +120,16 @@ var runscopeConverterV1 = {
 	},
 
 	handleAuth: function (request, step) {
-		if(step.auth.auth_type === 'basic') {
-			request.currentHelper = 'basicAuth';
-			request.helperAttributes = {
-				id: 'basic',
-				saveToRequest: true,
-				username: step.auth.username,
-				password: step.auth.password,
-			};
+		if(step.auth) {
+			if (step.auth.auth_type === 'basic') {
+				request.currentHelper = 'basicAuth';
+				request.helperAttributes = {
+					id: 'basic',
+					saveToRequest: true,
+					username: step.auth.username,
+					password: step.auth.password,
+				};
+			}
 		}
 		//no other auth types supported yet
 		//do oauth1 next
