@@ -319,7 +319,7 @@ var runscopeConverterV1 = {
 		runscopeJson = this.validateRunscope(runscopeJson);
 		var collection = this.initCollection(runscopeJson);
 
-		_.each(runscopeJson.steps, function(step) {
+		_.each(_.filter(runscopeJson.steps, function(step) { return step.step_type !== 'pause'; }), function(step) {
 			oldThis.addRequest(collection, oldThis.getRequestFromStep(step));
 		});
 
